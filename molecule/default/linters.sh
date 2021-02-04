@@ -21,5 +21,5 @@ export ANSIBLE_TEST_PLUGINS=$PWD/test_plugins
 export ANSIBLE_VARS_PLUGINS=$PWD/vars_plugins
 
 yamllint .
-ansible-lint
+ansible-lint .
 flake8

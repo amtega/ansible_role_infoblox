@@ -1,0 +1,14 @@
+{% for host in infoblox_hosts %}
+- name: {{ host.name }}
+  state: {{ host.state }}
+  network_interfaces:
+{% for vlan in host.vlans %}
+{% set vlan_fetched =  infoblox_vlans | selectattr('name','equalto', vlan) | list %}
+{% if vlan_fetched | length > 0 %}
+{% set gateway_pfx = vlan_fetched.0.gateway + '/' + vlan_fetched.0.cidr | string %}
+{% set vlan_network = gateway_pfx | ipaddr('network/prefix') %}
+    - vlan: {{ vlan_fetched[0].name }}
+      network: {{ vlan_network }}
+{% endif %}
+{% endfor %}
+{% endfor %}

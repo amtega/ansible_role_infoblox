@@ -1,2 +1,29 @@
 ---
 # Role tasks
+
+
+- name: retrieve host ips
+  set_fact:
+    infoblox_host_register: >-
+      {{ lookup('template', 'fill_hosts.j2') | from_yaml | list }}
+
+- name: print working variable
+  debug:
+    var: infoblox_host_register
+
+- name: save networks
+  debug:
+    msg: "{{ lookup('template', 'extract_ips.j2') | from_yaml | list }}"
+  loop: "{{ infoblox_host_register }}"
+
+# - include_tasks: delete_host.yml
+#   loop: >-
+#     {{ hosts | selectattr('state','in',['absent', 'forced']) | list }}
+#   tags:
+#     - role::infoblox::del
+
+# - include_tasks: add_host.yml
+#   loop: >-
+#     {{ infoblox_hosts_register }}
+#   tags:
+#     - role::infoblox::add

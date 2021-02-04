@@ -1,2 +1,29 @@
 ---
 # Role default lower priority variables
+
+# List of host / vlans to register
+# hosts:
+#   - name: examplehost.domain.com
+#     state: present / absent / force
+#     dns: Config for dns. Boolean. Default false
+#     vlans:
+#       - vlanName1
+#       - vlanName2
+infoblox_hosts: []
+
+
+# This role need a list of dicts with vlan info
+# Every element must content at least
+# {
+#   name: vlanName # vlan name
+#   id: 1466 # vlanID
+#   cidr: 24 # network cidr
+#   gateway: 10.112.106.1  # network gateway
+# }
+infoblox_vlans: []
+
+# Infoblox credentials for ansible nios modules/filters
+nios_provider:
+  host: infoblox.server.com
+  username: ansible
+  password: changeme
