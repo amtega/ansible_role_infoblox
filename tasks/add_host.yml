@@ -1,0 +1,18 @@
+---
+# Role tasks
+- name: Verify host not exist
+  set_fact:
+    host_check: "{{ lookup('nios', 'record:host', filter={'name':host_managed.name}, provider=infoblox_nios_provider) }}"
+
+- fail:
+    msg: "Host to add {{ host_managed.name }} already exist in Infoblox"
+  when: (host_check is defined) or (host_check|length > 0)
+
+- name: configure an ipv4 host record
+  nios_host_record:
+    name: "{{ host_managed.name }}"
+    configure_for_dns: "{{ host_managed.dns | default('no') }}"
+    ipv4: "{{ lookup('template', 'extract_ips.j2') | from_yaml | list }}"
+    state: "{{ host_managed.state }}"
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local

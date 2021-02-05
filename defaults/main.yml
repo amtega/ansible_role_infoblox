@@ -5,7 +5,7 @@
 # hosts:
 #   - name: examplehost.domain.com
 #     state: present / absent / force
-#     dns: Config for dns. Boolean. Default false
+#     dns: Config for dns. yes /no. Default no.
 #     vlans:
 #       - vlanName1
 #       - vlanName2
@@ -23,7 +23,7 @@ infoblox_hosts: []
 infoblox_vlans: []
 
 # Infoblox credentials for ansible nios modules/filters
-nios_provider:
+infoblox_nios_provider:
   host: infoblox.server.com
   username: ansible
   password: changeme

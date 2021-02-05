@@ -1,0 +1,16 @@
+---
+# Role tasks
+- name: Verify host exist
+  set_fact:
+    ipaddr: "{{ lookup('nios', 'record:host', filter={'name':host_managed.name}, provider=infoblox_nios_provider) }}"
+
+- fail:
+    msg: "Host to delete {{ host_managed.name }} not exist in Infoblox"
+  when: (ipaddr is not defined) or (ipaddr|length == 0)
+
+- name: remove a host record from the system
+  nios_host_record:
+    name: "{{ host_managed.name }}"
+    state: absent
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local

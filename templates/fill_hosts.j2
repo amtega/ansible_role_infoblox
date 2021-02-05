@@ -9,6 +9,7 @@
 {% set vlan_network = gateway_pfx | ipaddr('network/prefix') %}
     - vlan: {{ vlan_fetched[0].name }}
       network: {{ vlan_network }}
+      ipv4addr: {{ lookup('nios_next_ip', vlan_network, provider=infoblox_nios_provider) }}
 {% endif %}
 {% endfor %}
 {% endfor %}
