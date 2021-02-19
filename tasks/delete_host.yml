@@ -1,0 +1,16 @@
+---
+# Role tasks
+
+- name: remove a host record from the system
+  nios_host_record:
+    name: "{{ host_delete.name }}"
+    configure_for_dns: "{{ host_delete.dns | default('no') }}"
+    state: absent
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local
+  register: result
+
+- name: Register delete host
+  set_fact:
+    infoblox_hosts_deleted: >-
+      {{ infoblox_hosts_deleted | default([]) + [ host_delete ] }}

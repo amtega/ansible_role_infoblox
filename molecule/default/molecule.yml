@@ -6,38 +6,24 @@ driver:
   name: docker
 lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
 platforms:
-  - name: "centos6-${INSTANCE_UUID:-1}"
-    image: centos:6
-    groups:
-      - molecule_hosts
-      - molecule_hosts_centos
-      - molecule_hosts_centos_6
   - name: "centos7-${INSTANCE_UUID:-1}"
     image: centos:7
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_7
-  - name: "centos8-${INSTANCE_UUID:-1}"
-    image: centos:8
-    groups:
-      - molecule_hosts
-      - molecule_hosts_centos
-      - molecule_hosts_centos_8
-  - name: "fedora29-${INSTANCE_UUID:-1}"
-    image: fedora:29
-    groups:
-      - molecule_hosts
-      - molecule_hosts_fedora
-      - molecule_hosts_fedora_29
-  - name: "fedora30-${INSTANCE_UUID:-1}"
-    image: fedora:30
-    groups:
-      - molecule_hosts
-      - molecule_hosts_fedora
-      - molecule_hosts_fedora_30
+
 provisioner:
   name: ansible
+  ansible_args:
+    - --inventory=${ANSIBLE_INVENTORY}
+    - --vault-password-file=${ANSIBLE_VAULT_PASSWORD_FILE:-/etc/hostname}
   config_options:
     defaults:
       callback_whitelist: profile_tasks
@@ -46,8 +32,32 @@ provisioner:
     hosts:
       molecule_hosts:
         vars:
-      molecule_hosts_fedora:
-        vars:
-          ansible_python_interpreter: /usr/bin/python3
+          ansible_user: root
+
+          infoblox_hosts:
+            - name: ansible_test1.xunta.local
+              state: present
+              dns: false
+              vlans:
+                - vlanMANAG
+                - vlanDevGEN
+            - name: ansible_test2.xunta.local
+              state: present
+              dns: false
+              vlans:
+                - vlanMANAG
+                - vlanDevGEN
+
+          infoblox_vlans:
+            - name: vlanDevGEN
+              cidr: 24
+              gateway: 10.8.1.1
+
+            - name: vlanMANAG
+              cidr: 24
+              gateway: 10.9.1.1
+
+          infoblox_no_log: true
+
 verifier:
   name: ansible

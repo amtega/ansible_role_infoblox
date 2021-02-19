@@ -1,2 +1,10 @@
 ---
 # Role tasks
+
+- include_tasks: check_host.yml
+  loop: >-
+    {{ infoblox_hosts }}
+  loop_control:
+    loop_var: host_managed
+  tags:
+    - role::infoblox::check

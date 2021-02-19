@@ -1,0 +1,12 @@
+---
+# Role tasks
+
+- name: configure an ipv4 host record
+  nios_host_record:
+    name: "{{ host_add.name }}"
+    configure_for_dns: "{{ host_add.dns | default('no') }}"
+    comment: "{{ host_add.comment }}"
+    ipv4: "{{ lookup('template', 'extract_ips.j2') | from_yaml | list }}"
+    state: "{{ host_add.state }}"
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local
