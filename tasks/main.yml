@@ -1,24 +1,10 @@
 ---
 # Role tasks
 
-
-- name: retrieve host ips
-  set_fact:
-    infoblox_host_register: >-
-      {{ lookup('template', 'fill_hosts.j2') | from_yaml | list }}
-
-- include_tasks: delete_host.yml
+- include_tasks: check_host.yml
   loop: >-
-    {{ hosts | selectattr('state','in',['absent', 'forced']) | list }}
+    {{ infoblox_hosts }}
   loop_control:
     loop_var: host_managed
   tags:
-    - role::infoblox::del
-
-- include_tasks: add_host.yml
-  loop: >-
-    {{ infoblox_hosts_register | selectattr('state','in',['present', 'forced']) | list }}
-  loop_control:
-    loop_var: host_managed
-  tags:
-    - role::infoblox::add
+    - role::infoblox::check

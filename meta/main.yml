@@ -22,4 +22,4 @@ dependencies:
       packages_python:
         all:
           all:
-            infoblox_client: present
+            infoblox-client: present

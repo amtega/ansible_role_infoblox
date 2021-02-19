@@ -4,8 +4,9 @@
 # List of host / vlans to register
 # hosts:
 #   - name: examplehost.domain.com
-#     state: present / absent / force
+#     state: present / absent
 #     dns: Config for dns. yes /no. Default no.
+#     comment: <text>
 #     vlans:
 #       - vlanName1
 #       - vlanName2
@@ -16,7 +17,6 @@ infoblox_hosts: []
 # Every element must content at least
 # {
 #   name: vlanName # vlan name
-#   id: 1466 # vlanID
 #   cidr: 24 # network cidr
 #   gateway: 10.112.106.1  # network gateway
 # }
@@ -27,3 +27,6 @@ infoblox_nios_provider:
   host: infoblox.server.com
   username: ansible
   password: changeme
+
+# Flag which incicated is yo must show return variables on screen
+infoblox_no_log: true

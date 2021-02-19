@@ -1,15 +1,16 @@
-{% for host in infoblox_hosts %}
-- name: {{ host.name }}
-  state: {{ host.state }}
+- name: {{ host_managed.name }}
+  state: {{ host_managed.state }}
+  dns: {{ host_managed.dns | default('no') }}
+  comment: "Provisioned by Ansible"
   network_interfaces:
-{% for vlan in host.vlans %}
+{% for vlan in host_managed.vlans %}
 {% set vlan_fetched =  infoblox_vlans | selectattr('name','equalto', vlan) | list %}
 {% if vlan_fetched | length > 0 %}
 {% set gateway_pfx = vlan_fetched.0.gateway + '/' + vlan_fetched.0.cidr | string %}
 {% set vlan_network = gateway_pfx | ipaddr('network/prefix') %}
     - vlan: {{ vlan_fetched[0].name }}
       network: {{ vlan_network }}
-      ipv4addr: {{ lookup('nios_next_ip', vlan_network, provider=infoblox_nios_provider) }}
+{% set ip_retrieved = lookup('nios_next_ip', vlan_network, provider=infoblox_nios_provider) %}
+      ipv4addr: {{ ip_retrieved[0] }}
 {% endif %}
-{% endfor %}
 {% endfor %}

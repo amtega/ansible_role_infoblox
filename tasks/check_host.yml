@@ -1,0 +1,72 @@
+---
+# Role tasks
+
+- name: Verify host exist
+  set_fact:
+    host_checked: >-
+       {{ lookup('nios', 'record:host', filter={'name':host_managed.name},
+        provider=infoblox_nios_provider,
+        return_fields=['ipv4addrs', 'name', 'comment']) }}
+
+- block:
+
+    - name: Check host data
+      fail:
+        msg: "{{ host_managed.name }} already exist in infoblox and ips not match inventory"
+      when: >-
+        ( host_checked.ipv4addrs | length != host_managed.vlans | length ) or
+        (( host_checked.comment is defined ) and
+        ( host_checked.comment is not search('Ansible')))
+
+    - name: Return existing host
+      set_fact:
+        infoblox_host_register: >-
+          {{ lookup('template', 'exist_hosts.j2') | from_yaml | list }}
+  when:
+    - host_checked is defined
+    - host_checked | length > 0
+    - host_managed.state not in ['absent']
+
+- name: Retrieve ips if host not exist
+  set_fact:
+    infoblox_host_register: >-
+      {{ lookup('template', 'fill_hosts.j2') | from_yaml | list }}
+  when:
+    - (host_checked is not defined) or (host_checked | length == 0)
+    - host_managed.state not in ['absent']
+
+
+- include_tasks: delete_host.yml
+  loop: >-
+    {{ [ host_managed ] | selectattr('state','in',['absent']) | list }}
+  loop_control:
+    loop_var: host_delete
+  tags:
+    - role::infoblox::del
+
+- include_tasks: add_host.yml
+  loop: >-
+    {{ infoblox_host_register | default([]) | selectattr('state','in',['present']) | list }}
+  loop_control:
+    loop_var: host_add
+  tags:
+    - role::infoblox::add
+
+- name: Fill return variable for host add / provisioned
+  set_fact:
+    infoblox_hosts_data: >-
+      {{ infoblox_hosts_data | default([]) + infoblox_host_register | default([]) }}
+
+- name: Fill return variable for host deleted
+  set_fact:
+    infoblox_hosts_deleted_data: "{{ infoblox_hosts_deleted | default([]) }}"
+
+- name: return host data in infoblox
+  debug:
+    var: infoblox_hosts_data
+  when: not infoblox_no_log
+
+- name: return host data in infoblox
+  debug:
+    var: infoblox_hosts_deleted_data
+  when: not infoblox_no_log
