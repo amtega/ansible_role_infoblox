@@ -1,0 +1,31 @@
+---
+
+- include_tasks: gather.yml
+
+- include_tasks: delete.yml
+  loop: >-
+    {{ [host_to_manage] | selectattr("state", "in", ["absent"]) | list }}
+  loop_control:
+    loop_var: host_to_delete
+
+- include_tasks: add.yml
+  loop: >-
+    {{ infoblox_host_record
+       | default([])
+       | selectattr("state", "in", ["present"])
+       | list }}
+  loop_control:
+    loop_var: host_to_add
+
+- name: Setup fact with deleted hosts infoblox data
+  set_fact:
+    infoblox_deleted_hosts_records: >-
+      {{ infoblox_deleted_hosts_records | default([])
+         + ([host_to_manage]
+            | selectattr("state", "in", ["absent"]) | list) }}
+
+- name: Setup fact with added hosts infoblox data
+  set_fact:
+    infoblox_hosts_records: >-
+      {{ infoblox_hosts_records | default([])
+         + infoblox_host_record | default([]) }}

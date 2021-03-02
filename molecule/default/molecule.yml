@@ -1,0 +1,79 @@
+---
+
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
+platforms:
+  - name: "centos7-${INSTANCE_UUID:-1}"
+    image: centos:7
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - molecule_hosts
+      - molecule_hosts_centos
+      - molecule_hosts_centos_7
+scenario:
+  check_sequence:
+    - dependency
+    - destroy
+    - create
+    - prepare
+    - converge
+    - check
+    - cleanup
+    - destroy
+  destroy_sequence:
+    - dependency
+    - destroy
+  test_sequence:
+    - dependency
+    - lint
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
+provisioner:
+  name: ansible
+  ansible_args:
+    - --inventory=${ANSIBLE_INVENTORY}
+    - --vault-password-file=${ANSIBLE_VAULT_PASSWORD_FILE:-/etc/hostname}
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks
+      action_plugins: $PWD/action_plugins
+  inventory:
+    hosts:
+      molecule_hosts:
+        vars:
+          ansible_user: root
+          infoblox_hosts: "{{ infoblox_hosts_to_manage }}"
+
+          infoblox_hosts_to_manage:
+            - name: ansible_test1.acme.com
+              state: present
+              dns: false
+              vlans: >-
+                {{ (infoblox_vlans | map(attribute="name") | list)[0:2] }}
+
+            - name: ansible_test2.acme.com
+              state: present
+              dns: false
+              vlans: >-
+                {{ (infoblox_vlans | map(attribute="name") | list)[0:2] }}
+
+          infoblox_no_log: no
+
+verifier:
+  name: ansible

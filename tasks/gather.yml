@@ -1,0 +1,43 @@
+---
+
+- name: Setup fact with host record found in infoblox
+  set_fact:
+    _infoblox_host_record_found: >-
+       {{ lookup("nios",
+                 "record:host",
+                 filter={"name":host_to_manage.name},
+                 provider=infoblox_nios_provider,
+                 return_fields=["ipv4addrs", "name", "comment"]) }}
+
+- block:
+    - name: Verify host data
+      fail:
+        msg: >-
+          {{ host_to_manage.name }} already exist in infoblox and IP addreses
+          doesn't match ansible inventory
+      when: >-
+        (_infoblox_host_record_found.ipv4addrs | length
+         != host_to_manage.vlans | length)
+        or (_infoblox_host_record_found.comment is defined
+            and _infoblox_host_record_found.comment != infoblox_comment)
+
+    - name: Setup fact with existing host infoblox record
+      set_fact:
+        infoblox_host_record: >-
+          {{ lookup("template", "existing.yaml.j2")
+             | from_yaml
+             | list }}
+  when:
+    - _infoblox_host_record_found is defined
+    - _infoblox_host_record_found | length > 0
+    - host_to_manage.state not in ["absent"]
+
+- name: Setup fact with new host infoblox record
+  set_fact:
+    infoblox_host_record: >-
+      {{ lookup("template", "new.yaml.j2") | from_yaml | list }}
+  when:
+    - >-
+      _infoblox_host_record_found is not defined
+      or _infoblox_host_record_found | length == 0
+    - host_to_manage.state not in ["absent"]

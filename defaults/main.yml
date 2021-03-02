@@ -1,0 +1,35 @@
+---
+# Role default lower priority variables
+
+# List of dicts with the hosts/vlans to register. The format of the dicts is the
+# following:
+#
+# {
+#   name: <hostname>
+#   state: <present_absent>
+#   dns: <yes_dns>                # Create config for DNS. Default is no.
+#   comment: <text>
+#   vlans: <list>                 # List of strings with VLAN names
+#
+# }
+infoblox_hosts: []
+
+# List of dicts with VLANs info. The format of the dicts is the following:
+#
+# {
+#   name: <vlan_name>
+#   cidr: <network_cidr>
+#   gateway: <gateway>
+# }
+infoblox_vlans: []
+
+# Infoblox provider as defined in ansible nios_host_* modules
+
+infoblox_nios_provider:
+  host: infoblox.server.com
+  username: ansible
+  password: changeme
+
+# Hide sensitive information
+
+infoblox_no_log: yes

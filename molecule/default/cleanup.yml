@@ -1,0 +1,24 @@
+---
+
+- name: Cleanup
+  hosts: molecule_hosts
+  connection: local
+  gather_facts: no
+  roles:
+    - role: amtega.infoblox
+      vars:
+        infoblox_hosts: >-
+          {{ infoblox_hosts_to_manage
+             | map("combine", {"state": "absent"})
+             | list }}
+  tasks:
+    - name: Assert result facts are correct
+      assert:
+        that:
+          - infoblox_deleted_hosts_records | length == infoblox_hosts | length
+          - >-
+            infoblox_deleted_hosts_records
+            | map(attribute="vlans")
+            | sum(start=[])
+            | list
+            | length == 4

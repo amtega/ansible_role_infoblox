@@ -1,0 +1,9 @@
+---
+# Role tasks
+
+- include_tasks: manage.yml
+  loop: "{{ infoblox_hosts }}"
+  loop_control:
+    loop_var: host_to_manage
+  tags:
+    - role::infoblox

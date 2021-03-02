@@ -1,0 +1,32 @@
+{% set ns = namespace(ip_fetched = "Not found") %}
+- name: {{ _infoblox_host_record_found.name }}
+  state: provisioned
+  comment: {{ _infoblox_host_record_found.comment | default("") }}
+  network_interfaces:
+{% set host_fetched = infoblox_hosts
+                      | selectattr("name",
+                                   "equalto",
+                                   _infoblox_host_record_found.name)
+                      | list %}
+{% set inventory_vlans = host_fetched[0].vlans %}
+{% for vlan in inventory_vlans %}
+{% set vlan_fetched =  infoblox_vlans
+                       | selectattr("name","equalto", vlan)
+                       | list %}
+{% if vlan_fetched | length > 0 %}
+{% set gateway_pfx = vlan_fetched.0.gateway
+                     + "/"
+                     + vlan_fetched.0.cidr | string %}
+{% set vlan_network = gateway_pfx | ipaddr("network/prefix") %}
+    - vlan: {{ vlan_fetched[0].name }}
+      network: {{ vlan_network }}
+{% set ns.ip_fetched = "Not found" %}
+{% for ip in _infoblox_host_record_found.ipv4addrs %}
+{% set ip_found = vlan_network | network_in_usable(ip.ipv4addr) %}
+{% if ip_found %}
+{% set ns.ip_fetched = ip.ipv4addr %}
+{% endif %}
+{% endfor %}
+      ipv4addr: {{ ns.ip_fetched }}
+{% endif %}
+{% endfor %}

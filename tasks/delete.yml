@@ -1,0 +1,11 @@
+---
+
+- name: Remove infoblox host record
+  nios_host_record:
+    name: "{{ host_to_delete.name }}"
+    configure_for_dns: "{{ host_to_delete.dns | default('no') }}"
+    state: absent
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local
+  register: result
+  no_log: "{{ infoblox_no_log | bool }}"

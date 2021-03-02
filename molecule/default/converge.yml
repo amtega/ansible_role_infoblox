@@ -1,0 +1,19 @@
+---
+
+- name: Converge
+  hosts: molecule_hosts
+  connection: local
+  gather_facts: no
+  roles:
+    - amtega.infoblox
+  tasks:
+    - name: Assert result facts are correct
+      assert:
+        that:
+          - infoblox_hosts_records | length == infoblox_hosts | length
+          - >-
+            infoblox_hosts_records
+            | map(attribute="network_interfaces")
+            | sum(start=[])
+            | list
+            | length == 4

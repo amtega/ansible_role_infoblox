@@ -1,0 +1,6 @@
+---
+# Role variables
+
+# Ansible comment to use in infoblox
+
+infoblox_comment: "Managed by ansible"

@@ -1,0 +1,25 @@
+---
+# Role dependencies
+
+galaxy_info:
+  role_name: infoblox
+  author: José Enrique Mourón Regueira
+  description: Register/unregister hosts in Infoblox
+  company: AMTEGA - Xunta de Galicia
+  license: GPLv3 or EUPL
+  min_ansible_version: 2.10
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+  galaxy_tags:
+    - ansible
+    - infoblox
+
+dependencies:
+  - role: amtega.packages
+    vars:
+      packages_python:
+        all:
+          all:
+            infoblox-client: present

@@ -1,0 +1,3 @@
+{% for interface in host_to_add.network_interfaces %}
+- address: {{ interface.ipv4addr }}
+{% endfor %}

@@ -1,0 +1,12 @@
+---
+
+- name: Add infoblox host record
+  nios_host_record:
+    name: "{{ host_to_add.name }}"
+    configure_for_dns: "{{ host_to_add.dns | default('no') }}"
+    comment: "{{ host_to_add.comment }}"
+    ipv4: "{{ lookup('template', 'ips.yaml.j2') | from_yaml | list }}"
+    state: "{{ host_to_add.state }}"
+    provider: "{{ infoblox_nios_provider }}"
+  connection: local
+  no_log: "{{ infoblox_no_log | bool }}"
