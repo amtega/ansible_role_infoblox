@@ -7,5 +7,4 @@
     state: absent
     provider: "{{ infoblox_nios_provider }}"
   connection: local
-  register: result
   no_log: "{{ infoblox_no_log | bool }}"
