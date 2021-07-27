@@ -2,6 +2,12 @@
 
 dependency:
   name: galaxy
+  enabled: yes
+  options:
+    ignore-certs: yes
+    ignore-errors: yes
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
 driver:
   name: docker
 lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
@@ -63,13 +69,13 @@ provisioner:
           infoblox_hosts_to_manage:
             - name: ansible_test1.acme.com
               state: present
-              dns: false
+              dns: no
               vlans: >-
                 {{ (infoblox_vlans | map(attribute="name") | list)[0:2] }}
 
             - name: ansible_test2.acme.com
               state: present
-              dns: false
+              dns: no
               vlans: >-
                 {{ (infoblox_vlans | map(attribute="name") | list)[0:2] }}
 
