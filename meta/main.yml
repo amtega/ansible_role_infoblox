@@ -3,6 +3,7 @@
 
 galaxy_info:
   role_name: infoblox
+  namespace: amtega
   author: José Enrique Mourón Regueira
   description: Register/unregister hosts in Infoblox
   company: AMTEGA - Xunta de Galicia
