@@ -70,12 +70,12 @@ Tests need and infoblox NIOS working server and settings. So, to run the tests y
 ```shell
 cd amtega.infoblox
 
-ANSIBLE_INVENTORY=~/myinventory ANSIBLE_VAULT_PASSWORD_FILE=~/myvaultpassword molecule test
+ANSIBLE_INVENTORY=~/myinventory ANSIBLE_VAULT_PASSWORD_FILE=~/myvaultpassword molecule test --all
 ```
 
 ## License
 
-Copyright (C) 2021 AMTEGA - Xunta de Galicia
+Copyright (C) 2022 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 
